@@ -6,23 +6,23 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     strategy:
+      fail-fast: false # This ensures Windows keeps building even if Mac fails
       matrix:
-        # This tells GitHub to run on both Windows and Mac simultaneously
         os: [macos-latest, windows-latest]
 
     steps:
       - name: Check out git repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4 # Updated to v4
 
       - name: Install Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4 # Updated to v4
         with:
-          node-version: 20
+          node-version: 24 # Updated to 24
 
       - name: Install dependencies
         run: npm install
 
       - name: Build Electron App
-        run: npm run build # Make sure "build" in package.json uses electron-builder
+        run: npm run build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
