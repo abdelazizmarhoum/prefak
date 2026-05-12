@@ -1,0 +1,22 @@
+# Ignore node_modules
+node_modules/
+
+# Ignore build files
+dist/
+build/
+
+# Ignore database file (it will be recreated)
+*.db
+
+# Ignore Electron cache
+.cache/
+
+# Ignore environment variables
+.env
+.env.production
+
+# OS generated files
+.DS_Store
+
+# Windows metadata
+Thumbs.db

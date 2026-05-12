@@ -1,0 +1,26 @@
+PREFAK — ARCHITECTURE DU PROJET
+
+L'application est structurée selon les standards Electron pour garantir sécurité et performance.
+
+1. PROCESSUS PRINCIPAL (Main Process - src/main/main.js)
+- Gère le cycle de vie de l'application.
+- Effectue les opérations lourdes sur le système de fichiers et la base de données.
+- Expose des canaux sécurisés via IPC (Inter-Process Communication).
+
+2. PRÉCHARGEMENT (Preload Script - src/preload/preload.js)
+- Fait le pont entre le Main Process et le Renderer Process.
+- Expose uniquement les fonctions nécessaires sous l'objet global "window.api".
+
+3. PROCESSUS DE RENDU (Renderer Process - src/renderer/)
+- Gère l'affichage (index.html).
+- Gère le style (style.css).
+- Exécute la logique de l'interface (renderer.js) sans avoir d'accès direct au système, garantissant une sécurité maximale contre les injections.
+
+4. BASE DE DONNÉES (src/database/db.js)
+- Définit le schéma des tables.
+- Gère l'initialisation et la migration des données.
+- Située par défaut dans le dossier utilisateur (AppData) pour la persistance.
+
+5. SYSTÈME DE FICHIERS
+- Dossier "uploads" : Stocke les images des matériaux téléchargées par l'utilisateur.
+- Dossier "lib" : Contient les bibliothèques externes locales pour un fonctionnement hors-ligne.

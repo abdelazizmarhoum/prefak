@@ -1,0 +1,27 @@
+PREFAK — INSTALLATION ET LANCEMENT
+
+PRÉREQUIS :
+- Installer Node.js (version LTS) sur votre machine.
+
+ÉTAPES :
+
+1. INSTALLATION DES DÉPENDANCES
+Ouvrez un terminal dans le dossier du projet et lancez :
+> npm install
+
+2. LANCEMENT DE L'APPLICATION
+Pour démarrer l'application, lancez :
+> npm start
+
+3. PREMIER LANCEMENT (DONNÉES)
+L'application crée automatiquement sa base de données lors du premier lancement.
+Pour tester rapidement toutes les fonctionnalités :
+- Allez dans la section "Paramètres" (Sidebar).
+- Cliquez sur "Charger les données de démonstration".
+- L'application sera remplie de matériaux, clients, ventes et graphiques réalistes.
+
+4. DÉPANNAGE
+Si l'application ne se lance pas :
+- Vérifiez que vous n'avez pas une autre instance d'Electron en cours.
+- Assurez-vous que le dossier node_modules a été correctement créé.
+- En cas d'erreur de base de données, vérifiez les droits d'écriture dans votre dossier utilisateur (AppData).

@@ -1,0 +1,54 @@
+{
+  "name": "prefak-app",
+  "version": "1.0.0",
+  "description": "Suite ERP Logistique & Commerciale",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder",
+    "package": "electron-packager . PREFAK --platform=win32 --arch=x64 --out=dist --icon=assets/icon.png --overwrite",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "PREFAK",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "better-sqlite3": "^12.9.0",
+    "chart.js": "^4.5.1",
+    "html5-qrcode": "^2.3.8",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.7",
+    "qrcode": "^1.5.4",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "electron": "^41.5.0",
+    "electron-builder": "^26.8.1",
+    "electron-packager": "^17.1.2"
+  },
+  "build": {
+    "appId": "com.prefak.logistics",
+    "productName": "PREFAK",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "dir",
+      "icon": "assets/icon.png"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "asar": true,
+    "protocols": {
+      "name": "PREFAK",
+      "schemes": [
+        "prefak-img",
+        "prefak-asset"
+      ]
+    }
+  }
+}

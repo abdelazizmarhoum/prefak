@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' prefak-img: prefak-asset: https://fonts.googleapis.com https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: prefak-img: prefak-asset:;">
+    <title>PREFAK — Gestion Logistique</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="app-layout">
+
+    <!-- ===== SIDEBAR ===== -->
+    <nav class="sidebar">
+        <div class="sidebar-logo">
+            <img src="prefak-asset://assets/icon.png" alt="Logo">
+            <span>PREFAK</span>
+        </div>
+
+        <div class="sidebar-section-label">Logistique</div>
+        <ul class="sidebar-nav">
+            <li class="nav-item active" data-page="dashboard"><span class="nav-icon">📊</span> Tableau de bord</li>
+            <li class="nav-item" data-page="inventory"><span class="nav-icon">📦</span> Inventaire</li>
+            <li class="nav-item" data-page="production"><span class="nav-icon">🏗️</span> Production</li>
+            <li class="nav-item" data-page="history"><span class="nav-icon">🕒</span> Historique Stock</li>
+        </ul>
+
+        <div class="sidebar-section-label">Commercial</div>
+        <ul class="sidebar-nav">
+            <li class="nav-item" data-page="clients"><span class="nav-icon">👥</span> Clients</li>
+            <li class="nav-item" data-page="sales"><span class="nav-icon">💰</span> Ventes</li>
+        </ul>
+
+        <div class="sidebar-section-label">Finance</div>
+        <ul class="sidebar-nav">
+            <li class="nav-item" data-page="expenses"><span class="nav-icon">💸</span> Dépenses</li>
+            <li class="nav-item" data-page="analytics"><span class="nav-icon">📈</span> Analyses</li>
+        </ul>
+
+        <div class="sidebar-section-label">Administration</div>
+        <ul class="sidebar-nav">
+            <li class="nav-item" data-page="settings"><span class="nav-icon">⚙️</span> Paramètres</li>
+        </ul>
+
+        <div style="padding: 20px;">
+            <button class="btn btn-primary" style="width:100%; justify-content:center; gap:8px;" onclick="startScanner()">
+                <span>📷</span> Scanner QR
+            </button>
+        </div>
+
+        <div class="sidebar-footer">© 2026 PREFAK Logistics</div>
+    </nav>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main-area">
+        <header class="topbar">
+            <h2 id="page-title">Tableau de bord</h2>
+            <div class="topbar-right">
+                <div class="status-indicator"></div>
+                <span id="current-date"></span>
+            </div>
+        </header>
+        <main class="content" id="content"></main>
+    </div>
+</div>
+
+<!-- =============================================
+     MODALS
+     ============================================= -->
+
+<!-- Material Modal -->
+<div class="modal-backdrop" id="modal-material" style="display:none">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="modal-material-title">Nouveau Matériau</h3>
+            <button class="modal-close" data-close="modal-material">×</button>
+        </div>
+        <form id="form-material" class="modal-body">
+            <input type="hidden" id="mat-id">
+            <div class="form-grid-2">
+                <div class="form-group full-width">
+                    <label>Nom du matériau *</label>
+                    <input type="text" id="mat-name" required placeholder="Ex: Poutre bois 4m">
+                </div>
+                <div class="form-group">
+                    <label>Quantité initiale</label>
+                    <input type="number" id="mat-qty" min="0" step="0.01" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Unité *</label>
+                    <input type="text" id="mat-unit" required placeholder="Ex: m², kg, Unité">
+                </div>
+                <div class="form-group">
+                    <label>Prix unitaire (MAD)</label>
+                    <input type="number" id="mat-price" min="0" step="0.01" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Seuil alerte stock</label>
+                    <input type="number" id="mat-threshold" min="0" value="10">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Image</label>
+                <div class="image-picker">
+                    <button type="button" id="btn-pick-image" class="btn btn-secondary">📁 Choisir une image</button>
+                    <span id="image-filename">Aucune image</span>
+                    <input type="hidden" id="mat-image">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-ghost" data-close="modal-material">Annuler</button>
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Stock Move Modal -->
+<div class="modal-backdrop" id="modal-stock" style="display:none">
+    <div class="modal modal-sm">
+        <div class="modal-header">
+            <h3 id="modal-stock-title">Mouvement de Stock</h3>
+            <button class="modal-close" data-close="modal-stock">×</button>
+        </div>
+        <form id="form-stock" class="modal-body">
+            <input type="hidden" id="stock-mat-id">
+            <input type="hidden" id="stock-type">
+            <div class="form-group">
+                <label>Matériau</label>
+                <input type="text" id="stock-mat-name" disabled>
+            </div>
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label>Quantité *</label>
+                    <input type="number" id="stock-qty" min="0.01" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Unité</label>
+                    <input type="text" id="stock-unit" disabled>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Note / Description</label>
+                <input type="text" id="stock-desc" placeholder="Ex: Livraison fournisseur">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-ghost" data-close="modal-stock">Annuler</button>
+                <button type="submit" class="btn btn-primary">Confirmer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Scanner Modal -->
+<div class="modal-backdrop" id="modal-scanner" style="display:none">
+    <div class="modal modal-sm">
+        <div class="modal-header">
+            <h3>Scanner un Matériau</h3>
+            <button class="modal-close" data-close="modal-scanner">×</button>
+        </div>
+        <div class="modal-body">
+            <div id="qr-reader" style="width: 100%; border: 1px solid var(--border);"></div>
+            <p class="text-center text-muted" style="margin-top:10px; font-size:12px;">Scannez le code QR du matériau</p>
+        </div>
+    </div>
+</div>
+
+<!-- Scan Result / Type Selection Modal -->
+<div class="modal-backdrop" id="modal-scan-choice" style="display:none">
+    <div class="modal modal-sm">
+        <div class="modal-header">
+            <h3>Mouvement de Stock</h3>
+            <button class="modal-close" data-close="modal-scan-choice">×</button>
+        </div>
+        <div class="modal-body text-center">
+            <h4 id="choice-mat-name" class="fw-600"></h4>
+            <p class="text-muted" style="margin: 10px 0 20px;">Choisissez le type d'opération :</p>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <button class="btn btn-secondary" style="flex-direction:column; padding: 20px; border-color: var(--green); color: var(--green);" id="btn-choice-in">
+                    <span style="font-size:24px;">📥</span><br>ENTRÉE (IN)
+                </button>
+                <button class="btn btn-secondary" style="flex-direction:column; padding: 20px; border-color: var(--danger); color: var(--danger);" id="btn-choice-out">
+                    <span style="font-size:24px;">📤</span><br>SORTIE (OUT)
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- QR View Modal -->
+<div class="modal-backdrop" id="modal-qr" style="display:none">
+    <div class="modal modal-sm">
+        <div class="modal-header">
+            <h3>Code QR Matériau</h3>
+            <button class="modal-close" data-close="modal-qr">×</button>
+        </div>
+        <div class="modal-body text-center">
+            <img id="qr-img" style="width:200px; height:200px; margin: 0 auto; display:block; border: 1px solid var(--border);">
+            <p id="qr-label" class="fw-600 mt-16"></p>
+            <button class="btn btn-primary mt-16" onclick="printQR()">🖨️ Imprimer / Sauvegarder</button>
+        </div>
+    </div>
+</div>
+
+<!-- Production Modal -->
+<div class="modal-backdrop" id="modal-production" style="display:none">
+    <div class="modal modal-lg">
+        <div class="modal-header">
+            <h3 id="modal-prod-title">Nouvelle Production</h3>
+            <button class="modal-close" data-close="modal-production">×</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="prod-id">
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label>Nom du produit *</label>
+                    <input type="text" id="prod-name" required placeholder="Ex: Maison Modèle A">
+                </div>
+                <div class="form-group">
+                    <label>Quantité produite</label>
+                    <input type="number" id="prod-qty" value="1" min="1">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Notes</label>
+                <input type="text" id="prod-notes" placeholder="Chantier, client, remarques...">
+            </div>
+
+            <!-- Material items builder (only shown for new productions) -->
+            <div id="prod-items-section">
+                <div class="section-label">Matériaux consommés</div>
+                <div class="form-grid-3" style="margin-bottom: 8px;">
+                    <select id="prod-mat-select"><option value="">-- Choisir un matériau --</option></select>
+                    <input type="number" id="prod-mat-qty" placeholder="Quantité" min="0.01" step="0.01">
+                    <button type="button" id="btn-add-prod-item" class="btn btn-secondary">+ Ajouter</button>
+                </div>
+                <table class="table" id="prod-items-table">
+                    <thead><tr><th>Matériau</th><th>Quantité</th><th>Unité</th><th></th></tr></thead>
+                    <tbody id="prod-items-body"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-ghost" data-close="modal-production">Annuler</button>
+            <button type="button" id="btn-save-production" class="btn btn-primary">Enregistrer</button>
+        </div>
+    </div>
+</div>
+
+<!-- Production Detail Modal -->
+<div class="modal-backdrop" id="modal-prod-detail" style="display:none">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="modal-prod-detail-title">Détails Production</h3>
+            <button class="modal-close" data-close="modal-prod-detail">×</button>
+        </div>
+        <div class="modal-body" id="modal-prod-detail-body"></div>
+    </div>
+</div>
+
+<!-- Client Modal -->
+<div class="modal-backdrop" id="modal-client" style="display:none">
+    <div class="modal modal-sm">
+        <div class="modal-header">
+            <h3 id="modal-client-title">Nouveau Client</h3>
+            <button class="modal-close" data-close="modal-client">×</button>
+        </div>
+        <form id="form-client" class="modal-body">
+            <input type="hidden" id="cli-id">
+            <div class="form-group">
+                <label>Nom / Raison sociale *</label>
+                <input type="text" id="cli-name" required>
+            </div>
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label>Téléphone</label>
+                    <input type="text" id="cli-phone">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="cli-email">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Adresse</label>
+                <input type="text" id="cli-address">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-ghost" data-close="modal-client">Annuler</button>
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Sale Modal -->
+<div class="modal-backdrop" id="modal-sale" style="display:none">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="modal-sale-title">Nouvelle Vente</h3>
+            <button class="modal-close" data-close="modal-sale">×</button>
+        </div>
+        <form id="form-sale" class="modal-body">
+            <input type="hidden" id="sale-id">
+            <div class="form-group">
+                <label>Client *</label>
+                <select id="sale-client" required></select>
+            </div>
+            <div class="form-group">
+                <label>Description du produit *</label>
+                <input type="text" id="sale-desc" required placeholder="Ex: Maison Modèle A — Casablanca">
+            </div>
+            <div class="form-group">
+                <label>Lier à une production (optionnel)</label>
+                <select id="sale-production"><option value="">-- Aucune production liée --</option></select>
+            </div>
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label>Prix de vente HT (MAD) *</label>
+                    <input type="number" id="sale-price" min="0" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>TVA (%)</label>
+                    <input type="number" id="sale-tax" value="20" min="0" max="100">
+                </div>
+            </div>
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label>Statut</label>
+                    <select id="sale-status">
+                        <option value="PAID">Payée</option>
+                        <option value="PENDING">En attente</option>
+                        <option value="CANCELLED">Annulée</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="sale-date">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Notes</label>
+                <input type="text" id="sale-notes">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-ghost" data-close="modal-sale">Annuler</button>
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Expense Modal -->
+<div class="modal-backdrop" id="modal-expense" style="display:none">
+    <div class="modal modal-sm">
+        <div class="modal-header">
+            <h3 id="modal-expense-title">Nouvelle Dépense</h3>
+            <button class="modal-close" data-close="modal-expense">×</button>
+        </div>
+        <form id="form-expense" class="modal-body">
+            <input type="hidden" id="exp-id">
+            <div class="form-group">
+                <label>Catégorie *</label>
+                <input type="text" id="exp-category" required placeholder="Ex: Loyer, Salaires, Carburant...">
+            </div>
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label>Montant (MAD) *</label>
+                    <input type="number" id="exp-amount" min="0" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="exp-date">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <input type="text" id="exp-desc">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-ghost" data-close="modal-expense">Annuler</button>
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="lib/jspdf.umd.min.js"></script>
+<script src="lib/jspdf.plugin.autotable.min.js"></script>
+<script src="lib/chart.umd.js"></script>
+<script src="lib/xlsx.full.min.js"></script>
+<script src="lib/html5-qrcode.min.js"></script>
+<script src="renderer.js"></script>
+</body>
+</html>

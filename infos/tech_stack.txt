@@ -1,0 +1,20 @@
+PREFAK — TECHNOLOGIES UTILISÉES
+
+ARCHITECTURE LOGICIELLE :
+- Electron : Framework principal pour transformer l'application web en logiciel de bureau.
+- Node.js : Gestion du backend et des fichiers locaux.
+
+BASE DE DONNÉES :
+- SQLite 3 : Base de données SQL locale, légère et sans serveur.
+- Better-SQLite3 : Pilote ultra-rapide pour les interactions Node <-> SQL.
+
+FRONTEND (INTERFACE) :
+- HTML5 / CSS3 : Structure et design (Design system "Professional Sharp").
+- JavaScript (ES6+) : Logique de l'interface utilisateur.
+
+BIBLIOTHÈQUES CLÉS :
+- Chart.js : Génération des graphiques financiers.
+- jsPDF : Création des factures et rapports PDF.
+- XLSX (SheetJS) : Exportation des données vers Excel.
+- Html5-QRCode : Moteur de scan par caméra.
+- QRCode.js : Génération des codes QR pour les matériaux.

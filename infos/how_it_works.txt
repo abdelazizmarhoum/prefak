@@ -1,0 +1,22 @@
+PREFAK — FONCTIONNEMENT GLOBAL
+
+L'application PREFAK centralise trois flux majeurs :
+
+1. LE FLUX LOGISTIQUE (STOCK)
+- L'inventaire suit les matières premières (bois, ciment, etc.).
+- Chaque mouvement (Entrée via scanner/manuel ou Sortie via production) est enregistré.
+- Le système calcule automatiquement la valeur totale de votre stock en temps réel.
+
+2. LE FLUX DE PRODUCTION
+- Vous créez des "Productions" (ex: une maison modulaire).
+- Lors de la création, vous listez les matériaux consommés.
+- L'application réduit instantanément le stock de ces matériaux et lie les consommations à ce projet spécifique pour le calcul du coût (COGS).
+
+3. LE FLUX COMMERCIAL
+- Les clients sont enregistrés dans une base de données dédiée.
+- Les ventes sont liées aux productions ou créées librement.
+- Une vente génère une facture PDF et alimente le Chiffre d'Affaires.
+
+4. ANALYSE FINANCIÈRE
+- Le tableau de bord compare vos Ventes (Revenus) avec le coût des matériaux utilisés (COGS) et vos dépenses fixes (Loyer, Salaires).
+- Il affiche votre bénéfice net et votre marge en temps réel.
